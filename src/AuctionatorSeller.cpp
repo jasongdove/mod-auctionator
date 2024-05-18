@@ -46,7 +46,7 @@ void AuctionatorSeller::LetsGetToIt(uint32 maxCount, uint32 houseId)
             it.entry
             , it.name
             , it.BuyPrice
-            , it.stackable
+            , LEAST(it.stackable, aicconf.stack_count) as stackable
             , it.quality
             , mp.average_price
         FROM
