@@ -163,12 +163,20 @@ void AuctionatorSeller::LetsGetToIt(uint32 maxCount, uint32 houseId)
         }
 
         if (price == 0) {
-            price = 10000000 * qualityMultiplier;
+            // only use quality multiplier on items without a market price
+            price = nator->config->sellerConfig.defaultPrice * qualityMultiplier;
         }
+
+        float bidStartModifier = nator->config->sellerConfig.bidStartModifier;
+
+        // +/- 15%, capped
+        float priceModifier = bidStartModifier * price / 2.0;
+        price = GetRandomNumber(
+                price - (uint32)priceModifier,
+                std::min(price + (uint32)priceModifier, 2140000000u));
 
         // calculate our starting bid price
         uint32 bidPrice = price;
-        float bidStartModifier = nator->config->sellerConfig.bidStartModifier;
         logDebug("Bid start modifier: " + std::to_string(bidStartModifier));
         bidPrice = GetRandomNumber(bidPrice - (bidPrice * bidStartModifier), bidPrice);
         logDebug("Bid price " + std::to_string(bidPrice) + " from price " + std::to_string(price));
@@ -176,8 +184,8 @@ void AuctionatorSeller::LetsGetToIt(uint32 maxCount, uint32 houseId)
         AuctionatorItem newItem = AuctionatorItem();
         newItem.itemId = fields[0].Get<uint32>();
         newItem.quantity = 1;
-        newItem.buyout = uint32(price * stackSize * qualityMultiplier);
-        newItem.bid = uint32(bidPrice * stackSize * qualityMultiplier);
+        newItem.buyout = uint32(price * stackSize);
+        newItem.bid = uint32(bidPrice * stackSize);
         newItem.time = 60 * 60 * 12;
         newItem.stackSize = stackSize;
 
