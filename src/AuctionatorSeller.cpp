@@ -107,6 +107,7 @@ void AuctionatorSeller::LetsGetToIt(uint32 maxCount, uint32 houseId)
             -- for uniques in this class to limit dups
             AND (ic.itemCount IS NULL OR ic.itemCount < aicconf.max_count)
             AND VerifiedBuild != 1
+            AND it.quality > 0
         ORDER BY RAND()
         LIMIT {}
         ;
