@@ -277,13 +277,13 @@ uint32 AuctionatorBidder::CalculateBuyPrice(AuctionEntry* auction, ItemTemplate 
         stackSize = auction->itemCount;
     }
 
-    // get our miltiplier configuration so we can get the right quality multiplier.
+    // get our multiplier configuration so we can get the right quality multiplier.
     AuctionatorPriceMultiplierConfig multiplierConfig = config->bidderMultipliers;
     uint32 quality  = item->Quality;
     float qualityMultiplier = Auctionator::GetQualityMultiplier(multiplierConfig, quality);
 
     // figure out if we are using our itemtemplate->BuyPrice or market price.
-    uint32 price = item->BuyPrice;
+    uint32 price = item->BuyPrice * qualityMultiplier;
     if (marketPrice > 0) {
         logInfo("Using Market over Template for bid eval [" + item->Name1 + "] " +
             std::to_string(marketPrice) + " <--> " + std::to_string(price) +
@@ -291,6 +291,12 @@ uint32 AuctionatorBidder::CalculateBuyPrice(AuctionEntry* auction, ItemTemplate 
         price = marketPrice;
     }
 
+    float bidStartModifier = config->sellerConfig.bidStartModifier;
+
+    // pay up to market +15%
+    float priceModifier = bidStartModifier * price / 2.0;
+    price = price + priceModifier;
+
     // calculate the max price we will pay for this item stack.
-    return uint32(stackSize * price * qualityMultiplier);
+    return uint32(stackSize * price);
 }
