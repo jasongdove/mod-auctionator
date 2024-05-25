@@ -172,8 +172,9 @@ void AuctionatorEvents::EventAllianceSeller()
         AuctionatorSeller(gAuctionator, static_cast<uint32>(AUCTIONHOUSE_ALLIANCE));
 
     uint32 auctionCountAlliance = houses->AllianceAh->Getcount();
+    int32 toAdd = (int32)config->allianceSeller.maxAuctions - (int32)auctionCountAlliance;
 
-    if (auctionCountAlliance <= config->allianceSeller.maxAuctions) {
+    if (toAdd > 0) {
         logInfo(
             "Alliance count is good, here we go: "
             + std::to_string(auctionCountAlliance)
@@ -181,7 +182,7 @@ void AuctionatorEvents::EventAllianceSeller()
         );
 
         sellerAlliance.LetsGetToIt(
-            config->sellerConfig.auctionsPerRun,
+            std::min(config->sellerConfig.auctionsPerRun, (uint32)toAdd),
             AUCTIONHOUSE_ALLIANCE
         );
     } else {
@@ -196,8 +197,9 @@ void AuctionatorEvents::EventHordeSeller()
         AuctionatorSeller(gAuctionator, static_cast<uint32>(AUCTIONHOUSE_HORDE));
 
     uint32 auctionCountHorde = houses->HordeAh->Getcount();
+    int32 toAdd = (int32)config->hordeSeller.maxAuctions - (int32)auctionCountHorde;
 
-    if (auctionCountHorde <= config->hordeSeller.maxAuctions) {
+    if (toAdd > 0) {
         logInfo(
             "Horde count is good, here we go: "
             + std::to_string(auctionCountHorde)
@@ -205,7 +207,7 @@ void AuctionatorEvents::EventHordeSeller()
         );
 
         sellerHorde.LetsGetToIt(
-            config->sellerConfig.auctionsPerRun,
+            std::min(config->sellerConfig.auctionsPerRun, (uint32)toAdd),
             AUCTIONHOUSE_HORDE
         );
     } else {
@@ -219,8 +221,9 @@ void AuctionatorEvents::EventNeutralSeller()
         AuctionatorSeller(gAuctionator, static_cast<uint32>(AUCTIONHOUSE_NEUTRAL));
 
     uint32 auctionCountNeutral = houses->NeutralAh->Getcount();
+    int32 toAdd = (int32)config->neutralSeller.maxAuctions - (int32)auctionCountNeutral;
 
-    if (auctionCountNeutral <= config->neutralSeller.maxAuctions) {
+    if (toAdd > 0) {
         logInfo(
             "Neutral count is good, here we go: "
             + std::to_string(auctionCountNeutral)
@@ -228,7 +231,7 @@ void AuctionatorEvents::EventNeutralSeller()
         );
 
         sellerNeutral.LetsGetToIt(
-            config->sellerConfig.auctionsPerRun,
+            std::min(config->sellerConfig.auctionsPerRun, (uint32)toAdd),
             AUCTIONHOUSE_NEUTRAL
         );
 
