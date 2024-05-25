@@ -52,6 +52,10 @@ void Auctionator::CreateAuction(AuctionatorItem newItem, uint32 houseId)
     // Create the item (and add it to the update queue for the player ")
     Item* item = Item::CreateItem(newItem.itemId, 1, &player);
 
+    // set the "Crafted by ..." property of the item
+    if (item->GetTemplate()->HasSignature())
+        item->SetGuidValue(ITEM_FIELD_CREATOR, player.GetGUID());
+
     logTrace("adding item to player queue");
     item->AddToUpdateQueueOf(&player);
     uint32 randomPropertyId = Item::GenerateItemRandomPropertyId(newItem.itemId);
