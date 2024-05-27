@@ -38,7 +38,7 @@ Auctionator::Auctionator()
 Auctionator::~Auctionator()
 {}
 
-void Auctionator::CreateAuction(AuctionatorItem newItem, uint32 houseId)
+bool Auctionator::CreateAuction(AuctionatorItem newItem, uint32 houseId)
 {
     // will need this when we want to know details of the item for filtering
     // ItemTemplate const* prototype = sObjectMgr->GetItemTemplate(itemId);
@@ -51,6 +51,10 @@ void Auctionator::CreateAuction(AuctionatorItem newItem, uint32 houseId)
     logDebug("Creating Auction for item: " + std::to_string(newItem.itemId));
     // Create the item (and add it to the update queue for the player ")
     Item* item = Item::CreateItem(newItem.itemId, 1, &player);
+
+    // skip items that can't be traded
+    if (!item->CanBeTraded(false, true))
+        return false;
 
     // set the "Crafted by ..." property of the item
     if (item->GetTemplate()->HasSignature())
@@ -122,6 +126,8 @@ void Auctionator::CreateAuction(AuctionatorItem newItem, uint32 houseId)
     CharacterDatabase.CommitTransaction(trans);
 
     ObjectAccessor::RemoveObject(&player);
+
+    return true;
 }
 
 /**

@@ -134,7 +134,6 @@ void AuctionatorSeller::LetsGetToIt(uint32 maxCount, uint32 houseId)
     uint32 count = 0;
     do
     {
-        count++;
         Field* fields = result->Fetch();
 
         // TODO: refactor listing an item into a testable method
@@ -195,8 +194,10 @@ void AuctionatorSeller::LetsGetToIt(uint32 maxCount, uint32 houseId)
             + " to house " + std::to_string(houseId)
         );
 
+        if (nator->CreateAuction(newItem, houseId)) {
+            count++;
+        }
 
-        nator->CreateAuction(newItem, houseId);
         if (count == maxCount) {
             break;
         }
