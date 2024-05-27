@@ -42,13 +42,15 @@ void AuctionatorSeller::LetsGetToIt(uint32 maxCount, uint32 houseId)
     // c++ in a trinity specific iffy block thing and submit a PR i would be happy
     // to consider it, but left on my own I am going to stick with this sql query.
     std::string itemQuery = R"(
-        SELECT
+        SELECT * FROM
+        (SELECT
             it.entry
             , it.name
             , it.BuyPrice
             , LEAST(it.stackable, aicconf.stack_count) as stackable
             , it.quality
             , mp.average_price
+            , it.class
         FROM
             mod_auctionator_itemclass_config aicconf
             LEFT JOIN item_template it ON
@@ -106,10 +108,15 @@ void AuctionatorSeller::LetsGetToIt(uint32 maxCount, uint32 houseId)
             -- filter out items where we are already at or above max_count
             -- for uniques in this class to limit dups
             AND (ic.itemCount IS NULL OR ic.itemCount < aicconf.max_count)
-            AND VerifiedBuild != 1
+            AND it.VerifiedBuild != 1
+            -- don't post grey items
             AND it.quality > 0
+            -- only post quest items that have a market price
+            AND (aicconf.class <> 12 OR average_price > 0)
         ORDER BY RAND()
-        LIMIT {}
+        LIMIT {}) as `allitems`
+        -- filter out non trade good, recipe items that are sold by vendors
+        WHERE (`class` IN (7, 9) OR NOT EXISTS (SELECT 1 FROM npc_vendor npcv WHERE npcv.item = `entry`))
         ;
     )";
 
