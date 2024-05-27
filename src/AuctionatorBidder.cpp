@@ -93,12 +93,23 @@ void AuctionatorBidder::SpendSomeCash()
 
         bool success = false;
 
-        // If this item has a buyout price, let's try to buy it. Otherwise we will
-        // see if it's worth bidding on.
-        if (auction->buyout > 0) {
-            success = BuyoutAuction(auction, itemTemplate);
+        bool weaponOrArmor = itemTemplate->Class == ITEM_CLASS_WEAPON || itemTemplate->Class == ITEM_CLASS_ARMOR;
+
+        // restrict weapons and armor to uncommon+
+        if (weaponOrArmor && itemTemplate->Quality < ITEM_QUALITY_UNCOMMON) {
+            logInfo("Will not buy item class ["
+                    + std::to_string(itemTemplate->Class)
+                    + "] with quality ["
+                    + std::to_string(itemTemplate->Quality)
+                    + "]");
         } else {
-            success = BidOnAuction(auction, itemTemplate);
+            // If this item has a buyout price, let's try to buy it. Otherwise we will
+            // see if it's worth bidding on.
+            if (auction->buyout > 0) {
+                success = BuyoutAuction(auction, itemTemplate);
+            } else {
+                success = BidOnAuction(auction, itemTemplate);
+            }
         }
 
         if (success) {
