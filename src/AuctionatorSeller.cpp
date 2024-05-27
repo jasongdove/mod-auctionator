@@ -146,7 +146,16 @@ void AuctionatorSeller::LetsGetToIt(uint32 maxCount, uint32 houseId)
 
         // create a random number between 1 and stackSize
         if (stackSize > 1 && nator->config->sellerConfig.randomizeStackSize) {
-            stackSize = GetRandomNumber(1, stackSize);
+            uint32 itemClass = fields[6].Get<uint32>();
+
+            uint32 randomStackSize = GetRandomNumber(1, stackSize);
+
+            // give trade goods 30% chance to post a full stack
+            // (query pulls max stack size, so unmodified means full stack)
+            if (itemClass != ITEM_CLASS_TRADE_GOODS || (float)rand_chance() > 30.0f) {
+                stackSize = randomStackSize;
+            }
+
             logDebug("Stack size: " + std::to_string(stackSize));
         }
 
