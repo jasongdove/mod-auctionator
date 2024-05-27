@@ -23,11 +23,14 @@ void AuctionatorBidder::SpendSomeCash()
 {
     uint32 auctionatorPlayerGuid = buyerGuid.GetRawValue();
 
+    // ignore items that are sold by a vendor
     std::string query = R"(
         SELECT
             ah.id
         FROM auctionhouse ah
-        WHERE itemowner <> {} AND houseid = {};
+        INNER JOIN item_instance ii ON ii.guid = ah.itemguid
+        WHERE itemowner <> {} AND houseid = {}
+            AND NOT EXISTS (select 1 from acore_world.npc_vendor npcv where npcv.item = ii.itemEntry);
     )";
 
     // for testing we may want to bid on our own auctions.
