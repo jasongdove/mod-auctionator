@@ -100,10 +100,10 @@ void AuctionatorBidder::SpendSomeCash()
         bool isArmor = itemTemplate->Class == ITEM_CLASS_ARMOR;
         bool isShirt = isArmor && itemTemplate->InventoryType == INVTYPE_BODY;
         bool isLowQualityWeaponOrArmor = (isWeapon || isArmor) && itemTemplate->Quality < ITEM_QUALITY_UNCOMMON;
-        bool isCommonShirt = isShirt && itemTemplate->Quality == ITEM_QUALITY_COMMON;
+        bool isNormalShirt = isShirt && itemTemplate->Quality == ITEM_QUALITY_NORMAL;
 
         // restrict weapons and armor to uncommon+, except shirts
-        if (isLowQualityWeaponOrArmor && !isCommonShirt) {
+        if (isLowQualityWeaponOrArmor && !isNormalShirt) {
             logInfo("Will not buy item class ["
                     + std::to_string(itemTemplate->Class)
                     + "] with quality ["
