@@ -30,7 +30,7 @@ void AuctionatorBidder::SpendSomeCash()
         FROM auctionhouse ah
         INNER JOIN item_instance ii ON ii.guid = ah.itemguid
         WHERE itemowner <> {} AND houseid = {}
-            AND NOT EXISTS (select 1 from acore_world.npc_vendor npcv where npcv.item = ii.itemEntry);
+            AND NOT EXISTS (select 1 from acore_world.npc_vendor npcv where npcv.item = ii.itemEntry and maxcount = 0);
     )";
 
     // for testing we may want to bid on our own auctions.
